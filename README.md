@@ -1,9 +1,14 @@
 # Fixturies
 
-When factories are too slow and fixtures are too hard to maintain, use fixturies.
+When factories are too slow and fixtures are too hard to maintain, use **fixturies**.
 
 With **fixturies** you use factories to build your fixtures.  Then you get the speed
 of fixtures and the maintanability of factories.
+
+## You may need fixturies if ...
+
+You are using factories in your tests to re-create the same records over and over
+again, and your tests are running too slowly.
 
 ## Our Story
 
