@@ -20,6 +20,10 @@ But we didn't want to just switch to fixtures, because factories are easier to u
 
 So we wrote fixturies.  And our tests ran in 1 minute.  10x faster.  And we rejoiced.
 
+## Install
+
+`gem fixturies`
+
 ## Usage
 
     ## define a subclass of Fixturies
@@ -117,7 +121,7 @@ Calling `FixtureBuilder.create_fixtures` will now create the following files:
 
 ## Notes
 
- * We call `create_fixtures` from our spec_helper.rb file.  This means that the fixture files
+ * We call `FactoryGirl.create_fixtures` from our spec_helper.rb file.  This means that the fixture files
    are re-built once each time we run tests.
  * We add our fixture files to .gitignore
  * We use the factory library FactoryGirl.  So our build calls look like:
