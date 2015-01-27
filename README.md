@@ -22,7 +22,7 @@ So we wrote fixturies.  And our tests ran in 1 minute.  10x faster.  And we rejo
 
 ## Install
 
-`gem fixturies`
+add `gem 'fixturies'` to `Gemfile`
 
 ## Usage
 
