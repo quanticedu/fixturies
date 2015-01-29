@@ -12,13 +12,7 @@ again, and your tests are running too slowly.
 
 ## Our Story
 
-We had a rails app.  We used factories in our tests, and it took ten minutes to run them all.
-
-We suspected that a lot of the time was in the factories, probably in things like validations and callbacks, but it was a little hard to track down exactly where the time was going.  We wanted the callbacks and validations to run once to ensure the validity of the records we were using in tests, but we didn't need them to run over and over as we re-created identical records for each test.  
-
-But we didn't want to just switch to fixtures, because factories are easier to use and because they would ensure that the records we use in tests remain in line with records created by our changing codebase.
-
-So we wrote fixturies.  And our tests ran in 1 minute.  10x faster.  And we rejoiced.
+Read our blog post about how we made our tests run 10 times faster without making them any harder to maintain at [blog.pedago.com](http://blog.pedago.com/2015/01/28/fixturies-the-speed-of-fixtures-and-the-maintainability-of-factories/) 
 
 ## Install
 
