@@ -125,3 +125,14 @@ Calling `FixtureBuilder.create_fixtures` will now create the following files:
         end
 
    That also means that we can still use FactoryGirl in tests where need to create a specific record for use in just one test.
+   
+ * Right now, the code that clears out the database is not smart enough to deal with foreign key constraints.  In postgres (and maybe other dbs?) you can get around this by overriding clear_db in your subclass of Fixturies like below.  If you have another solution that is mroe general, please let me know or file a pull request.
+
+        def clear_db
+            self.class.table_names.each do |table_name|
+                quoted_table_name = ActiveRecord::Base.connection.quote_table_name(table_name)
+                ActiveRecord::Base.connection.execute("TRUNCATE #{quoted_table_name} CASCADE")
+            end
+            
+        end
+
