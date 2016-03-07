@@ -67,6 +67,17 @@ class Fixturies
         if record.id.nil?
             raise ArgumentError.new("No id for record.  Must be saved before calling identify")
         end
+
+        # ensure that we are not assigning the same name to two 
+        # different records
+        @records_by_name ||= {}
+        @records_by_name[record.class.table_name] ||= {}
+        existing_entry = @records_by_name[record.class.table_name][name]
+        if existing_entry && existing_entry != record
+            raise "Cannot assign the name #{name.inspect} to two different #{record.class.table_name}"
+        end
+        @records_by_name[record.class.table_name][name] = record
+        
         record_identifiers[record_key(record)] = name
     end
 
