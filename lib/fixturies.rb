@@ -4,12 +4,9 @@ class Fixturies
 
         attr_reader :fixtures_directory
 
-        def build(*things, &proc)
+        def build(&proc)
             meth_name = :"builder_#{rand}"
             define_method meth_name, &proc
-            things.each do |thing|
-                thing.is_a?(String) ? table(thing) : model(thing)
-            end
             builders << meth_name
         end
 
@@ -21,19 +18,23 @@ class Fixturies
             self.new.create_fixtures
         end
 
-        def table(table_name)
-            self.table_names << table_name
+        def table_names
+            @all_table_names ||= ActiveRecord::Base.connection.execute("
+                SELECT table_name
+                FROM information_schema.tables
+                WHERE
+                    table_schema = 'public'
+                    AND table_type = 'BASE TABLE'
+            ").to_a.map { |r| r['table_name'] }
+
+            @all_table_names - table_names_to_skip
         end
 
-        def model(model_klass)
-            self.table_names << model_klass.table_name
-        end 
-
-        def table_names
-            unless defined? @table_names
-                @table_names = Set.new 
-            end
-            @table_names
+        # you can add more tables to this if necessary.  For example,
+        # we had to add spatial_ref_sys, which is created by the
+        # postgis extension
+        def table_names_to_skip
+            @table_names_to_skip ||= ['schema_migrations']
         end
 
         def builders
@@ -55,6 +56,7 @@ class Fixturies
         clear_db
         build_all_records
         create_fixture_files
+        clear_db
     end
 
     def build_all_records
@@ -68,7 +70,7 @@ class Fixturies
             raise ArgumentError.new("No id for record.  Must be saved before calling identify")
         end
 
-        # ensure that we are not assigning the same name to two 
+        # ensure that we are not assigning the same name to two
         # different records
         @records_by_name ||= {}
         @records_by_name[record.class.table_name] ||= {}
@@ -77,7 +79,7 @@ class Fixturies
             raise "Cannot assign the name #{name.inspect} to two different #{record.class.table_name}"
         end
         @records_by_name[record.class.table_name][name] = record
-        
+
         record_identifiers[record_key(record)] = name
     end
 
@@ -95,12 +97,16 @@ class Fixturies
 
         FileUtils.mkdir_p(self.class.fixtures_directory)
 
-        self.class.table_names.each do |table_name|
-            
+        self.class.table_names.sort.each do |table_name|
+
+            filename = Rails.root.join(self.class.fixtures_directory, "#{table_name}.yml")
+            File.delete(filename) if File.exist?(filename)
+
             # create a simple ActiveRecord klass to connect
             # to the table and handle querying for us
             klass = Class.new(ActiveRecord::Base) {
                 self.table_name = table_name
+                self.inheritance_column = nil # do not blow up if the type column indicates we should be using single-table inheritance
             }
 
             hash = {}
@@ -108,8 +114,8 @@ class Fixturies
                 name = record_identifiers[record_key(record)] || "#{table_name.singularize}_#{i}"
                 hash[name] = record.attributes
             end
-            
-            File.open(Rails.root.join(self.class.fixtures_directory, "#{table_name}.yml"), 'w+') do |f|
+
+            File.open(filename, 'w+') do |f|
                 f.write(hash.to_yaml)
             end
 
@@ -119,11 +125,12 @@ class Fixturies
     private
     def clear_db
         self.class.table_names.each do |table_name|
+            # Note: This does not handle foreign key constraints.  See Readme for a solution
             quoted_table_name = ActiveRecord::Base.connection.quote_table_name(table_name)
             sql = "DELETE FROM #{quoted_table_name} "
             ActiveRecord::Base.connection.delete(sql, "#{quoted_table_name} Delete all")
         end
-        
+
     end
 
 end

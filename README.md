@@ -12,7 +12,7 @@ again, and your tests are running too slowly.
 
 ## Our Story
 
-Read our blog post about how we made our tests run 10 times faster without making them any harder to maintain at [blog.pedago.com](http://blog.pedago.com/2015/01/28/fixturies-the-speed-of-fixtures-and-the-maintainability-of-factories/) 
+Read our blog post about how we made our tests run 10 times faster without making them any harder to maintain at [blog.pedago.com](http://blog.pedago.com/2015/01/28/fixturies-the-speed-of-fixtures-and-the-maintainability-of-factories/)
 
 ## Install
 
@@ -23,48 +23,24 @@ add `gem 'fixturies'` to `Gemfile`
     ## define a subclass of Fixturies
     class FixtureBuilder < Fixturies
 
-      # Use `set_fixtures_directory` to tell Fixturies 
+      # Use `set_fixtures_directory` to tell Fixturies
       # where to put all of the fixtures files
       set_fixtures_directory Rails.root.join('spec', 'fixtures')
 
+      # By default, fixturies will create a fixtures file for
+      # every table in your public schema, except for `schema_migrations`.
+      # If there are other tables for which you do not want fixture files,
+      # add them to `table_names_to_skip`
+      table_names_to_skip << ['spatial_ref_sys']
+
       # Use the `build` method to create
       # the records you want available to your tests.
-      #
-      # Arguments are one or more active record
-      # classes and a block.
-      # 
-      # Any active record class passed to `build` will have
-      # a fixture file created for it.  The file will include
-      # any records created inside the block.
-      # (It is safe to pass the same class to multiple
-      # `build` calls.  You will still end up with a single fixture
-      # file including all the records) 
-      build(User) do
+      build do
           3.times do |i|
             User.create!({
               email: "my_user_#{i}@example.com"
             })
           end
-      end
-
-      # If records are created in a table that does not 
-      # have an associated active record class, you can just
-      # pass the table's name into `build`. 
-      #
-      # In this case, roles are attached to users through
-      # a users_roles table that does not have an associated
-      # ActiveRecord class.  By passing 'user_roles' into `build`, we
-      # tell Fixturies that it needs to write a fixture file
-      # for that table as well
-      build(User, 'users_roles', Role) do
-          my_user = User.new(email: "admin@example.com")
-
-          # `add_role` creates a record in the roles table and
-          # a record in the users_roles join table. Both records
-          # will have fixtures created for them (see fixture files
-          # below)
-          my_user.add_role('admin')
-          my_user.save!
       end
 
       # You can add a specific name to a fixture using the
@@ -80,7 +56,7 @@ add `gem 'fixturies'` to `Gemfile`
 Calling `FixtureBuilder.create_fixtures` will now create the following files:
 
 /spec/fixtures/users.yml
-  
+
     ---
     user_0:
       id: 62
@@ -125,7 +101,7 @@ Calling `FixtureBuilder.create_fixtures` will now create the following files:
         end
 
    That also means that we can still use FactoryGirl in tests where need to create a specific record for use in just one test.
-   
+
  * Right now, the code that clears out the database is not smart enough to deal with foreign key constraints.  In postgres (and maybe other dbs?) you can get around this by overriding clear_db in your subclass of Fixturies like below.  If you have another solution that is mroe general, please let me know or file a pull request.
 
         def clear_db
@@ -133,6 +109,6 @@ Calling `FixtureBuilder.create_fixtures` will now create the following files:
                 quoted_table_name = ActiveRecord::Base.connection.quote_table_name(table_name)
                 ActiveRecord::Base.connection.execute("TRUNCATE #{quoted_table_name} CASCADE")
             end
-            
+
         end
 
