@@ -56,7 +56,6 @@ class Fixturies
         clear_db
         build_all_records
         create_fixture_files
-        clear_db
     end
 
     def build_all_records
