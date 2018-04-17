@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'fixturies'
-  s.version     = '1.0.0'
-  s.date        = '2018-04-16'
+  s.version     = '1.0.1'
+  s.date        = '2018-04-17'
   s.summary     = "The speed of fixtures meets the maintanability of factories"
   s.description = "The speed of fixtures meets the maintanability of factories"
   s.authors     = ["Nate Brustein"]

@@ -115,8 +115,10 @@ class Fixturies
                 hash[name] = record.attributes
             end
 
-            File.open(filename, 'w+') do |f|
-                f.write(hash.to_yaml)
+            if hash.any?
+                File.open(filename, 'w+') do |f|
+                    f.write(hash.to_yaml)
+                end
             end
 
         end
