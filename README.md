@@ -12,7 +12,7 @@ again, and your tests are running too slowly.
 
 ## Our Story
 
-Read our blog post about how we made our tests run 10 times faster without making them any harder to maintain at [blog.smart.ly](http://blog.smart.ly/tag/unit-tests/)
+Read our blog post about how we made our tests run 10 times faster without making them any harder to maintain at [blog.smart.ly](http://blog.smart.ly/2015/01/28/fixturies-the-speed-of-fixtures-and-the-maintainability-of-factories/)
 
 ## Install
 
