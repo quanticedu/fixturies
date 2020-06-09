@@ -12,7 +12,7 @@ again, and your tests are running too slowly.
 
 ## Our Story
 
-Read our blog post about how we made our tests run 10 times faster without making them any harder to maintain at [blog.smart.ly](http://blog.smart.ly/2015/01/28/fixturies-the-speed-of-fixtures-and-the-maintainability-of-factories/)
+Read our blog post about how we made our tests run 10 times faster without making them any harder to maintain at [blog.quantic.edu](http://blog.quantic.edu/2015/01/28/fixturies-the-speed-of-fixtures-and-the-maintainability-of-factories/)
 
 ## Install
 
@@ -26,6 +26,11 @@ add `gem 'fixturies'` to `Gemfile`
       # Use `set_fixtures_directory` to tell Fixturies
       # where to put all of the fixtures files
       set_fixtures_directory Rails.root.join('spec', 'fixtures')
+
+      # Use `set_fixture_class` to tell Fixturies to
+      # bake the model_class directly into the YAML file
+      # using the `_fixture` property that ActiveRecord supports.
+      set_fixture_class nonconventional_name, Nonconventional::Name
 
       # By default, fixturies will create a fixtures file for
       # every table in your public schema, except for `schema_migrations`.
