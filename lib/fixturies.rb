@@ -2,7 +2,7 @@ class Fixturies
 
     class << self
 
-        attr_reader :fixtures_directory
+        attr_reader :fixtures_directory, :fixture_class_names
 
         def build(&proc)
             meth_name = :"builder_#{rand}"
@@ -12,6 +12,11 @@ class Fixturies
 
         def set_fixtures_directory(dir)
             @fixtures_directory = dir
+        end
+
+        def set_fixture_class(class_names = {})
+            @fixture_class_names ||= {}
+            @fixture_class_names = fixture_class_names.merge(class_names.stringify_keys)
         end
 
         def create_fixtures
@@ -115,6 +120,12 @@ class Fixturies
             end
 
             if hash.any?
+                # Rails allows baking the model_class into the YAML file, which
+                # can be useful if the class cannot be inferred from the table_name.
+                # See https://github.com/rails/rails/pull/20574/files
+                klass = self.class.fixture_class_names&.[](table_name)
+                hash['_fixture'] = {'model_class' => klass.to_s} if klass.present?
+
                 File.open(filename, 'w+') do |f|
                     f.write(hash.to_yaml)
                 end
