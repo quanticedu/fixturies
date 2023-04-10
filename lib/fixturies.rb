@@ -114,7 +114,7 @@ class Fixturies
             }
 
             virtual_column_names = klass.columns.filter_map do |column|
-              if column.virtual?
+              if column.try(:virtual?)
                   column.name
               end
             end
