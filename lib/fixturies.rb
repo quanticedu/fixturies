@@ -113,10 +113,20 @@ class Fixturies
                 self.inheritance_column = nil # do not blow up if the type column indicates we should be using single-table inheritance
             }
 
+            virtual_column_names = klass.columns.filter_map do |column|
+              if column.try(:virtual?)
+                  column.name
+              end
+            end
+
             hash = {}
             klass.all.each_with_index do |record, i|
                 name = record_identifiers[record_key(record)] || "#{table_name.singularize}_#{i}"
-                hash[name] = record.attributes
+                attributes = record.attributes
+                virtual_column_names.each do |column_name|
+                    attributes.delete(column_name)
+                end
+                hash[name] = attributes
             end
 
             if hash.any?
