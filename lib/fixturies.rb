@@ -5,7 +5,7 @@ class Fixturies
         attr_reader :fixtures_directory, :fixture_class_names
 
         def build(&proc)
-            meth_name = :"builder_#{rand}"
+            meth_name = :"builder_#{caller_locations.first.label}_#{caller_locations.first.lineno}"
             define_method meth_name, &proc
             builders << meth_name
         end
@@ -65,7 +65,9 @@ class Fixturies
 
     def build_all_records
         self.class.builders.each do |builder|
+            start = Time.now
             send(builder)
+            puts "#{builder} took #{Time.now - start} seconds"
         end
     end
 
